@@ -4,8 +4,8 @@ import fileManager
 import pydash
 
 
-class MyTestCase(unittest.TestCase):
-    def test_something(self):
+class FileManagerTest(unittest.TestCase):
+    def test_fileManager(self):
         testDataObj = {
             'left': {
                 'playerName': 'Dru'
