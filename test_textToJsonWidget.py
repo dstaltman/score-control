@@ -19,42 +19,42 @@ class TestTextToJsonWidget(unittest.TestCase):
 
     def test_update_string_value(self):
         # setup for str based widget
-        self._strIndex = "index"
-        self._strValue = "value"
-        self._strData = {self._strIndex: self._strValue}
-        self.textWidgetString = TextToJsonWidget(self._label, self._strData, self._strIndex)
+        index = "index"
+        value = "value"
+        data = {index: value}
+        widget = TextToJsonWidget(self._label, data, index)
 
         # test setup of str widget
-        self.assertEqual(self.textWidgetString.labelWidget.text(), self._label)
-        self.assertEqual(self.textWidgetString.jsonBlob, self._strData)
-        self.assertEqual(self.textWidgetString.dataType, str)
-        self.assertEqual(self.textWidgetString.textBox.text(), self._strValue)
+        self.assertEqual(self._label, widget.labelWidget.text())
+        self.assertEqual(data, widget.jsonBlob)
+        self.assertEqual(str, widget.dataType)
+        self.assertEqual(value, widget.textBox.text())
 
         # typing in the text box will append to existing string
-        QTest.keyClicks(self.textWidgetString.textBox, "new")
-        self.assertEqual("valuenew", self.textWidgetString.textBox.text())
-        self.assertEqual({self._strIndex: "valuenew"}, self.textWidgetString.jsonBlob)
+        QTest.keyClicks(widget.textBox, "new")
+        self.assertEqual("valuenew", widget.textBox.text())
+        self.assertEqual({index: "valuenew"}, widget.jsonBlob)
 
     def test_update_int_value(self):
         # setup for int based widget
-        self._intIndex = "index"
-        self._intValue = 1
-        self._intData = {self._intIndex: self._intValue}
-        self.textWidgetInt = TextToJsonWidget(self._label, self._intData, self._intIndex, int)
+        index = "index"
+        value = 1
+        data = {index: value}
+        widget = TextToJsonWidget(self._label, data, index, int)
 
         # test setup of int widget
-        self.assertEqual(self.textWidgetInt.labelWidget.text(), self._label)
-        self.assertEqual(self.textWidgetInt.jsonBlob, self._intData)
-        self.assertEqual(self.textWidgetInt.dataType, int)
-        self.assertEqual(self.textWidgetInt.textBox.text(), str(self._intValue))
+        self.assertEqual(self._label, widget.labelWidget.text())
+        self.assertEqual(data, widget.jsonBlob)
+        self.assertEqual(int, widget.dataType, int)
+        self.assertEqual(str(value), widget.textBox.text())
 
         # Using a string when a number will not change text
-        QTest.keyClicks(self.textWidgetInt.textBox, "k")
-        self.assertEqual(str(self._intValue), self.textWidgetInt.textBox.text())
-        # using a number will chage the string text and the json int value
-        QTest.keyClicks(self.textWidgetInt.textBox, "1")
-        self.assertEqual(str(self._intValue) + "1", self.textWidgetInt.textBox.text())
-        self.assertEqual({self._intIndex: 11}, self.textWidgetInt.jsonBlob)
+        QTest.keyClicks(widget.textBox, "k")
+        self.assertEqual(str(value), widget.textBox.text())
+        # using a number will change the string text and the json int value
+        QTest.keyClicks(widget.textBox, "1")
+        self.assertEqual(str(value) + "1", widget.textBox.text())
+        self.assertEqual({index: 11}, widget.jsonBlob)
 
     def test_new_string_value(self):
         # setup for str based widget where value is added
