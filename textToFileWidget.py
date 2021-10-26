@@ -6,7 +6,7 @@ from pathlib import Path
 
 class TextToFileWidget(QWidget):
     def __init__(self, file, label):
-        super().__init__()
+        QWidget.__init__(self)
 
         self.fileName = file
         self.text = ""
@@ -27,7 +27,6 @@ class TextToFileWidget(QWidget):
 
         with open(self.fileName, encoding='utf-8') as f:
             self.text = f.read()
-            print("Reading File - " + self.text)
             self.textBox.setText(self.text)
 
     @Slot()
