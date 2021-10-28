@@ -16,42 +16,37 @@ class IntegerWidget(QWidget):
         self.jsonBlob = json_blob
         self.jsonLocation = json_location
 
-        layout = QVBoxLayout()
-
+        layout = QHBoxLayout()
         self.label = QLabel(label)
         layout.addWidget(self.label)
 
-        # Number and buttons row
-        row = QHBoxLayout()
-
+        # Number and buttons
         # Button with -5
         self.minusFiveBtn = QPushButton("-5")
         self.minusFiveBtn.clicked.connect(self.minus_five_pressed)
-        row.addWidget(self.minusFiveBtn)
+        layout.addWidget(self.minusFiveBtn)
 
         # Button with -1
         self.minusOneBtn = QPushButton("-1")
         self.minusOneBtn.clicked.connect(self.minus_one_pressed)
-        row.addWidget(self.minusOneBtn)
+        layout.addWidget(self.minusOneBtn)
 
         # The Text box with the integer
         self.textBox = QLineEdit("")
         self.textBox.textEdited.connect(self.text_changed)
         validator = QIntValidator(0, 100, self)
         self.textBox.setValidator(validator)
-        row.addWidget(self.textBox)
+        layout.addWidget(self.textBox)
 
         # Button with +1
         self.addOneBtn = QPushButton("+1")
         self.addOneBtn.clicked.connect(self.add_one_pressed)
-        row.addWidget(self.addOneBtn)
+        layout.addWidget(self.addOneBtn)
 
         # Button with +5
         self.addFiveBtn = QPushButton("+5")
         self.addFiveBtn.clicked.connect(self.add_five_pressed)
-        row.addWidget(self.addFiveBtn)
-
-        layout.addLayout(row)
+        layout.addWidget(self.addFiveBtn)
 
         self.setLayout(layout)
 

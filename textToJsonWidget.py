@@ -4,7 +4,7 @@ import sys
 import pydash
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QIntValidator
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QApplication
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QApplication
 
 
 class TextToJsonWidget(QWidget):
@@ -16,7 +16,7 @@ class TextToJsonWidget(QWidget):
         self.text = ""
         self.dataType = data_type
 
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
         self.labelWidget = QLabel(label)
         layout.addWidget(self.labelWidget)
         self.textBox = QLineEdit()
