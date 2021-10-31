@@ -8,16 +8,17 @@
 import sys
 
 from PySide6.QtCore import Slot, SIGNAL, QTimer, QSettings, QSize, QPoint
-from PySide6.QtGui import QAction, QCloseEvent
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout
+from PySide6.QtGui import QCloseEvent
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 
 from fileManager import FileManager
 from textToJsonWidget import TextToJsonWidget
 from integerWidget import IntegerWidget
+from loadFileWidget import LoadFileWidget
 
 
 def create_json_widgets(layout, json_data: dict, data=None):
-    for mainWidgetData in data["mainWidgets"]:
+    for mainWidgetData in data:
         if mainWidgetData["type"] == "jsonWidget":
             jsonWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(jsonWidget)
@@ -30,24 +31,35 @@ class PlayerDetailsWidget(QWidget):
     def __init__(self, json_data: dict):
         QWidget.__init__(self)
 
-        data = {
-            "mainWidgets": [
+        layoutData = {
+            "mainLeftColumn": [
                 {"type": "jsonWidget", "label": "Left Player", "jsonLocation": "left.playerName"},
                 {"type": "jsonWidget", "label": "Left Army", "jsonLocation": "left.armyName"},
-                {"type": "integerWidget", "label": "Left Player Command Points", "jsonLocation": "left.commandPoints"},
-                {"type": "integerWidget", "label": "Left Player Total Points", "jsonLocation": "left.totalPoints"},
-
+                {"type": "integerWidget", "label": "Left Command Points", "jsonLocation": "left.commandPoints"},
+                {"type": "integerWidget", "label": "Left Total Points", "jsonLocation": "left.totalPoints"}
+            ],
+            "mainRightColumn": [
                 {"type": "jsonWidget", "label": "Right Player", "jsonLocation": "right.playerName"},
                 {"type": "jsonWidget", "label": "Right Army", "jsonLocation": "right.armyName"},
-                {"type": "integerWidget", "label": "Right Player Command Points", "jsonLocation": "right.commandPoints"},
-                {"type": "integerWidget", "label": "Right Player Total Points", "jsonLocation": "right.totalPoints"}
+                {"type": "integerWidget", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
+                {"type": "integerWidget", "label": "Right Total Points", "jsonLocation": "right.totalPoints"}
             ],
             "scoreWidgets": []
         }
 
         # Setup all the widgets in the layout
-        layout = QVBoxLayout()
-        create_json_widgets(layout, json_data, data)
+        layout = QHBoxLayout()
+
+        # Left Player column
+        leftColumn = QVBoxLayout()
+        create_json_widgets(leftColumn, json_data, layoutData["mainLeftColumn"])
+        layout.addLayout(leftColumn)
+
+        # Right Player column
+        rightColumn = QVBoxLayout()
+        create_json_widgets(rightColumn, json_data, layoutData["mainRightColumn"])
+        layout.addLayout(rightColumn)
+
         self.setLayout(layout)
 
 
@@ -55,50 +67,56 @@ class PlayerDetailsWidget(QWidget):
 # system.
 #
 class ScoreControl(QMainWindow):
+    # noinspection PyTypeChecker
     def __init__(self):
         QMainWindow.__init__(self)
         self.setWindowTitle("Score Control")
+        self.fileManager = None
+        self.json_data = None
 
         # Setup the window based on saved settings. Load any other
         # settings needed to start such as file locations
         self.read_settings()
 
-        # Load the file data and get it ready to send along
-        self.fileManager = FileManager("testdata.json")
-        json_data = self.fileManager.get_json_data()
+        # Try to load a file now. Based on how it loads is what we'll do
+        # with the widget later
+        self.initialize_file_manager()
 
-        # Menu
-        self.menu = self.menuBar()
-        self.file_menu = self.menu.addMenu("File")
-
-        # Exit button
-        exit_action = QAction("Exit", self)
-        exit_action.setShortcut("Ctrl+Q")
-        exit_action.triggered.connect(self.exit_app)
-
-        self.file_menu.addAction(exit_action)
-
-        # Central widget
-        widget = PlayerDetailsWidget(json_data)
-        self.setCentralWidget(widget)
+        # If we have a valid file, load default widget
+        if self.fileManager.is_valid():
+            playerWidget = PlayerDetailsWidget(self.json_data)
+            self.setCentralWidget(playerWidget)
+        else:
+            loadWidget = LoadFileWidget("Load File", self.file_selected)
+            self.setCentralWidget(loadWidget)
 
         # begin auto save
         self.timer = QTimer(self)
         self.connect(self.timer, SIGNAL("timeout()"), self.auto_save)
         self.timer.start(1000)
 
-    # When the window is closed, saave out its settings
+    # When the window is closed, save out its settings
     def closeEvent(self, event: QCloseEvent) -> None:
         self.write_settings()
         event.accept()
 
-    @Slot()
-    def exit_app(self):
-        QApplication.quit()
+    def file_selected(self, filename: str):
+        self.fileManager.set_file_path(filename)
+        # If we have a valid file, load default widget
+        if self.fileManager.is_valid():
+            self.json_data = self.fileManager.get_json_data()
+            playerWidget = PlayerDetailsWidget(self.json_data)
+            self.setCentralWidget(playerWidget)
 
     @Slot()
     def auto_save(self):
-        self.fileManager.write_file()
+        if isinstance(self.fileManager, FileManager):
+            self.fileManager.write_file()
+
+    def initialize_file_manager(self):
+        # Load the file data and get it ready to send along
+        self.fileManager = FileManager("")
+        self.json_data = self.fileManager.get_json_data()
 
     def read_settings(self):
         settings = QSettings()
