@@ -1,7 +1,6 @@
 import copy
 import json
 from os import path
-import pydash
 
 
 # Manages files by opening a json file and keeping in memory.
@@ -9,12 +8,19 @@ import pydash
 # returned by this module. When asked to save, this will check
 # if the json data is dirty before dumping it out.
 class FileManager:
-    def __init__(self, file_path):
-        self._filePath = file_path
+    def __init__(self, file_path: str):
+        self._filePath = None
         self.jsonData = None
         self.jsonOld = None
 
-        if not path.isfile(file_path):
+        self.set_file_path(file_path)
+
+    def set_file_path(self, file_path: str):
+        self._filePath = file_path
+        self.read_file()
+
+    def read_file(self):
+        if not path.isfile(self._filePath):
             return
 
         # load the json
