@@ -195,3 +195,4 @@ dmypy.json
 cython_debug/
 
 testdata.json
+.idea/vcs.xml
