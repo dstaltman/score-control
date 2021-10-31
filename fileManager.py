@@ -50,8 +50,3 @@ class FileManager:
 
     def is_valid(self):
         return isinstance(self.jsonData, dict)
-
-
-if __name__ == "__main__":
-    fileMan = FileManager('testdata.json')
-    print(fileMan.get_json_data())
