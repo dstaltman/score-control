@@ -73,6 +73,26 @@ class TestTextToJsonWidget(unittest.TestCase):
         self.assertEqual("new", widget.textBox.text())
         self.assertEqual({index: "new"}, widget.jsonBlob)
 
+    def test_no_data(self):
+        index = "index"
+        widget = TextToJsonWidget(self._label, None, index)
+
+        # text box data
+        self.assertEqual("", widget.textBox.text())
+        QTest.keyClicks(widget.textBox, "fail")
+        self.assertEqual("", widget.textBox.text())
+
+        self.assertTrue(isinstance(widget.jsonBlob, type(None)))
+
+        data = {"index": "value"}
+        widget.set_data(data)
+        self.assertEqual("value", widget.textBox.text())
+        self.assertTrue(widget.isEnabled())
+
+        widget.set_data(None)
+        self.assertEqual("", widget.textBox.text())
+        self.assertFalse(widget.isEnabled())
+
 
 if __name__ == '__main__':
     unittest.main()

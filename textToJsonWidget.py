@@ -33,6 +33,13 @@ class TextToJsonWidget(QWidget):
         self.read_blob_contents()
 
     def read_blob_contents(self):
+        if isinstance(self.jsonBlob, type(None)):
+            self.textBox.setText('')
+            self.setEnabled(False)
+            return
+        else:
+            self.setEnabled(True)
+
         val = pydash.get(self.jsonBlob, self.jsonLocation)
 
         # No matter the dataType we get input, output as a string
@@ -48,6 +55,10 @@ class TextToJsonWidget(QWidget):
             raise TypeError('Expected no value, int, or string')
 
         self.textBox.setText(self.text)
+
+    def set_data(self, json_data):
+        self.jsonBlob = json_data
+        self.read_blob_contents()
 
     @Slot()
     def text_changed(self, text):
@@ -67,19 +78,12 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # load the json
-    with open('testdata.json', 'r') as read_file:
-        data = json.load(read_file)
+    data = {
+        "playerName": "name"
+    }
 
-    # Widget
-
-    # int test case in a round
-    # window = TextToJsonWidget("Left Player", data, 'left.aosRoundScores[0].primaryScore', int)
-
-    # string test case
-    # window = TextToJsonWidget("Left player", data, 'left.playerName')
-
-    # test case where we have no pre-existing data
-    window = TextToJsonWidget("Left player", data, 'left.playerNameAlternate')
+    # Window
+    window = TextToJsonWidget("Left player", data, 'playerName', int)
 
     window.resize(800, 600)
     window.show()
