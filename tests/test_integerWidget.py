@@ -78,6 +78,23 @@ class IntegerWidgetTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             IntegerWidget("name", data, "index")
 
+    def test_none_value(self):
+        widget = IntegerWidget("int", None, "index")
+
+        # test empty and disabled
+        self.assertEqual("", widget.textBox.text())
+        self.assertFalse(widget.isEnabled())
+
+        # Add some data
+        data = {"index": 10}
+        widget.set_data(data)
+        self.assertEqual("10", widget.textBox.text())
+        self.assertTrue(widget.isEnabled())
+
+        widget.set_data(None)
+        self.assertEqual("", widget.textBox.text())
+        self.assertFalse(widget.isEnabled())
+
 
 if __name__ == '__main__':
     unittest.main()

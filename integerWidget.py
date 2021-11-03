@@ -54,6 +54,12 @@ class IntegerWidget(QWidget):
         self.read_value()
 
     def read_value(self):
+        if isinstance(self.jsonBlob, type(None)):
+            self.textBox.setText("")
+            self.setEnabled(False)
+            return
+        else:
+            self.setEnabled(True)
         val = pydash.get(self.jsonBlob, self.jsonLocation)
 
         # No matter the dataType we get input, output as a string
@@ -71,6 +77,10 @@ class IntegerWidget(QWidget):
         self.textBox.setText(val)
         if setJsonValue:
             self.set_json_value()
+
+    def set_data(self, json_data):
+        self.jsonBlob = json_data
+        self.read_value()
 
     def change_value(self, add: int):
         # Convert to int. This will not catch exceptions
