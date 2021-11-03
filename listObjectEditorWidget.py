@@ -1,0 +1,147 @@
+import sys
+
+import pydash
+import widgetHelpers
+from PySide6.QtCore import Slot, Qt
+from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QApplication, \
+    QSizePolicy, QFrame, QMessageBox
+
+
+# Widget that displays a list of objects to be edited
+#
+# List will support new, edit, delete functionality. The widget itself
+# is handed a list of objects that are all string types to be outputted
+# in a JSON file.
+class ListObjectEditorWidget(QWidget):
+    item_lines = []
+    message_box = None
+
+    def __init__(self, title: str, edit_data: dict, data_location: str, editor_layout: list):
+        super().__init__()
+
+        self.layout = QHBoxLayout()
+
+        # Left box with list of all objects to edit
+        self.left_layout = QVBoxLayout()
+        self.left_layout.setAlignment(Qt.AlignTop)
+
+        self.data = edit_data
+        self.data_location = data_location
+
+        assert isinstance(self.data[self.data_location], list)
+
+        self.data_list_label = QLabel(title)
+        self.data_list_label.setAlignment(Qt.AlignHCenter)
+        self.left_layout.addWidget(self.data_list_label)
+
+        self.layout.addLayout(self.left_layout)
+
+        # Right box that contains all the fields to edit in an object instance
+        self.right_layout = QVBoxLayout()
+
+        self.editor_label = (QLabel("Data Editor"))
+        self.editor_label.setAlignment(Qt.AlignHCenter)
+        self.right_layout.addWidget(self.editor_label)
+
+        widgetHelpers.create_json_widgets(self.right_layout, None, editor_layout)
+
+        self.layout.addLayout(self.right_layout)
+
+        # Initialize data and finalize the widget
+        self.populate_editor_data()
+
+        self.setLayout(self.layout)
+
+    def populate_editor_data(self):
+        self.item_lines.clear()
+        for obj in self.data[self.data_location]:
+            self.add_data_line(obj)
+
+    def add_data_line(self, line_data):
+        # Frame Widget for the object
+        line_frame = QFrame()
+        line_frame.setFrameStyle(QFrame.Panel | QFrame.Plain)
+        line_frame.setLineWidth(1)
+        line_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+
+        line_frame.object_data = line_data
+
+        # Layout for the widget
+        line_layout = QHBoxLayout()
+        line_layout.setAlignment(Qt.AlignTop)
+
+        # Object Name
+        line_layout.addWidget(QLabel(line_data['name']))
+
+        # Edit button
+        edit_button = QPushButton("Edit")
+        edit_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        edit_button.resize(40, edit_button.sizeHint().height())
+        edit_button.clicked.connect(lambda x: self.edit_data_button(line_frame))
+        line_layout.addWidget(edit_button)
+        line_frame.edit_button = edit_button
+
+        # delete button
+        del_button = QPushButton("Delete")
+        del_button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        del_button.resize(40, del_button.sizeHint().height())
+        del_button.clicked.connect(lambda x: self.delete_data_button(line_frame))
+        line_layout.addWidget(del_button)
+        line_frame.del_button = del_button
+
+        # final setup of layout and widget information
+        line_frame.setLayout(line_layout)
+        self.left_layout.addWidget(line_frame)
+        self.item_lines.append(line_frame)
+
+    @Slot()
+    def edit_data_button(self, arg):
+        return
+
+    @Slot()
+    def delete_data_button(self, arg):
+        msgBox = QMessageBox()
+        msgBox.setText("Are you sure you would like to delete " + arg.object_data['name'] + "?")
+        msgBox.setInformativeText("This cannot be undone")
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+
+        ret = msgBox.exec()
+        self.message_box = msgBox
+
+        if ret == QMessageBox.Yes:
+            self.message_box = None
+            self.confirm_delete(arg)
+        else:
+            self.message_box = None
+
+    @Slot()
+    def confirm_delete(self, arg):
+        self.left_layout.removeWidget(arg)
+        self.item_lines.remove(arg)
+        arg.hide()
+        pydash.remove(self.data[self.data_location], lambda x: x['name'] == arg.object_data['name'])
+
+
+if __name__ == "__main__":
+    # QT application
+    app = QApplication(sys.argv)
+
+    # test json data
+    test_data = {"index": [
+        {'name': 'ItemName'},
+        {'name': 'OtherItem'},
+    ]}
+
+    # layout for editor pane
+    test_editor_layout = [
+
+    ]
+
+    # Widget
+    window = ListObjectEditorWidget("editor", test_data, "index", test_editor_layout)
+
+    window.resize(800, 600)
+    window.show()
+
+    sys.exit(app.exec())
