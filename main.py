@@ -11,20 +11,9 @@ from PySide6.QtCore import Slot, SIGNAL, QTimer, QSettings, QSize, QPoint
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 
+import widgetHelpers
 from fileManager import FileManager
-from textToJsonWidget import TextToJsonWidget
-from integerWidget import IntegerWidget
 from loadFileWidget import LoadFileWidget
-
-
-def create_json_widgets(layout, json_data: dict, data=None):
-    for mainWidgetData in data:
-        if mainWidgetData["type"] == "jsonWidget":
-            jsonWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(jsonWidget)
-        elif mainWidgetData["type"] == "integerWidget":
-            intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(intWidget)
 
 
 class PlayerDetailsWidget(QWidget):
@@ -33,14 +22,14 @@ class PlayerDetailsWidget(QWidget):
 
         layoutData = {
             "mainLeftColumn": [
-                {"type": "jsonWidget", "label": "Left Player", "jsonLocation": "left.playerName"},
-                {"type": "jsonWidget", "label": "Left Army", "jsonLocation": "left.armyName"},
+                {"type": "textLineWidget", "label": "Left Player", "jsonLocation": "left.playerName"},
+                {"type": "textLineWidget", "label": "Left Army", "jsonLocation": "left.armyName"},
                 {"type": "integerWidget", "label": "Left Command Points", "jsonLocation": "left.commandPoints"},
                 {"type": "integerWidget", "label": "Left Total Points", "jsonLocation": "left.totalPoints"}
             ],
             "mainRightColumn": [
-                {"type": "jsonWidget", "label": "Right Player", "jsonLocation": "right.playerName"},
-                {"type": "jsonWidget", "label": "Right Army", "jsonLocation": "right.armyName"},
+                {"type": "textLineWidget", "label": "Right Player", "jsonLocation": "right.playerName"},
+                {"type": "textLineWidget", "label": "Right Army", "jsonLocation": "right.armyName"},
                 {"type": "integerWidget", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
                 {"type": "integerWidget", "label": "Right Total Points", "jsonLocation": "right.totalPoints"}
             ],
@@ -52,12 +41,12 @@ class PlayerDetailsWidget(QWidget):
 
         # Left Player column
         leftColumn = QVBoxLayout()
-        create_json_widgets(leftColumn, json_data, layoutData["mainLeftColumn"])
+        widgetHelpers.create_json_widgets(leftColumn, json_data, layoutData["mainLeftColumn"])
         layout.addLayout(leftColumn)
 
         # Right Player column
         rightColumn = QVBoxLayout()
-        create_json_widgets(rightColumn, json_data, layoutData["mainRightColumn"])
+        widgetHelpers.create_json_widgets(rightColumn, json_data, layoutData["mainRightColumn"])
         layout.addLayout(rightColumn)
 
         self.setLayout(layout)
@@ -67,7 +56,6 @@ class PlayerDetailsWidget(QWidget):
 # system.
 #
 class ScoreControl(QMainWindow):
-    # noinspection PyTypeChecker
     def __init__(self):
         QMainWindow.__init__(self)
         self.setWindowTitle("Score Control")
