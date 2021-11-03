@@ -5,6 +5,8 @@ from PySide6.QtCore import Qt
 
 
 class TestLoadFileWidget:
+    app = None
+
     @classmethod
     def setup_class(cls):
         if isinstance(QApplication.instance(), type(None)):
