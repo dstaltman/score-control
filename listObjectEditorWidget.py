@@ -14,7 +14,9 @@ from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QL
 # in a JSON file.
 class ListObjectEditorWidget(QWidget):
     item_lines = []
+    edit_widgets = []
     message_box = None
+    active_object = None
 
     def __init__(self, title: str, edit_data: dict, data_location: str, editor_layout: list):
         super().__init__()
@@ -34,16 +36,28 @@ class ListObjectEditorWidget(QWidget):
         self.data_list_label.setAlignment(Qt.AlignHCenter)
         self.left_layout.addWidget(self.data_list_label)
 
+        self.add_object_button = QPushButton("Add Item")
+        self.add_object_button.clicked.connect(self.add_object)
+        self.left_layout.addWidget(self.add_object_button)
+
         self.layout.addLayout(self.left_layout)
 
         # Right box that contains all the fields to edit in an object instance
         self.right_layout = QVBoxLayout()
+        self.right_layout.setAlignment(Qt.AlignTop)
 
         self.editor_label = (QLabel("Data Editor"))
         self.editor_label.setAlignment(Qt.AlignHCenter)
         self.right_layout.addWidget(self.editor_label)
 
-        widgetHelpers.create_json_widgets(self.right_layout, None, editor_layout)
+        # Add widgets for the edit pane
+        name_widget_data = {
+            'type': 'textLineWidget',
+            'label': 'Object Name',
+            'jsonLocation': 'name'
+        }
+        editor_layout.insert(0, name_widget_data)
+        widgetHelpers.create_json_widgets(self.right_layout, None, editor_layout, self.edit_widgets)
 
         self.layout.addLayout(self.right_layout)
 
@@ -56,6 +70,17 @@ class ListObjectEditorWidget(QWidget):
         self.item_lines.clear()
         for obj in self.data[self.data_location]:
             self.add_data_line(obj)
+
+    def add_object(self):
+        new_object = {'name': 'New Object'}
+        self.data[self.data_location].append(new_object)
+        self.add_data_line(new_object)
+        self.set_edit_object(new_object)
+
+    def set_edit_object(self, object_data):
+        self.active_object = object_data
+        for w in self.edit_widgets:
+            w.set_data(self.active_object)
 
     def add_data_line(self, line_data):
         # Frame Widget for the object
@@ -96,7 +121,7 @@ class ListObjectEditorWidget(QWidget):
 
     @Slot()
     def edit_data_button(self, arg):
-        return
+        self.set_edit_object(arg.object_data)
 
     @Slot()
     def delete_data_button(self, arg):
@@ -129,13 +154,22 @@ if __name__ == "__main__":
 
     # test json data
     test_data = {"index": [
-        {'name': 'ItemName'},
-        {'name': 'OtherItem'},
+        {'name': 'ItemName', 'textValue': 'text text', 'intValue': 111},
+        {'name': 'OtherItem', 'textValue': 'other text', 'intValue': 222}
     ]}
 
     # layout for editor pane
     test_editor_layout = [
-
+        {
+            'type': 'textLineWidget',
+            'label': 'text widget',
+            'jsonLocation': 'textValue'
+        },
+        {
+            'type': 'integerWidget',
+            'label': 'integer widget',
+            'jsonLocation': 'intValue'
+        }
     ]
 
     # Widget
