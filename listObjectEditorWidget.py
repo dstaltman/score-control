@@ -57,7 +57,7 @@ class ListObjectEditorWidget(QWidget):
             'jsonLocation': 'name'
         }
         editor_layout.insert(0, name_widget_data)
-        widgetHelpers.create_json_widgets(self.right_layout, None, editor_layout, self.edit_widgets)
+        widgetHelpers.create_json_widgets(self.right_layout, self.data, editor_layout, self.edit_widgets)
 
         self.layout.addLayout(self.right_layout)
 

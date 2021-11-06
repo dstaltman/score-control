@@ -196,3 +196,4 @@ cython_debug/
 
 testdata.json
 .idea/vcs.xml
+*.json
