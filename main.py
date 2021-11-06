@@ -6,6 +6,7 @@
 # super user friendly.
 
 import sys
+import copy
 
 from PySide6.QtCore import Slot, SIGNAL, QTimer, QSettings, QSize, QPoint
 from PySide6.QtGui import QCloseEvent
@@ -31,23 +32,14 @@ class PlayerDetailsWidget(QWidget):
                 {"type": "comboWidget", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategy",
                  "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
 
-                # Round 1
-                {"type": "separator", "label": "Round 1 Scoring"},
-                {"type": "integerWidget", "label": "Round 1 Primary",
-                 "jsonLocation": "left.aosRoundScores[0].primaryScore"},
-                {"type": "integerWidget", "label": "Round 1 Secondary",
-                 "jsonLocation": "left.aosRoundScores[0].secondaryScore"},
-                {"type": "comboWidget", "label": "Round 1 Secondary",
-                 "jsonLocation": "left.aosRoundScores[0].secondaryName", "itemsLocation": "sigmarObjectives",
-                 "itemFilterType": "battle tactic"},
-                {"type": "integerWidget", "label": "Round 1 Bonus",
-                 "jsonLocation": "left.aosRoundScores[0].bonusScore"},
             ],
             "mainRightColumn": [
                 {"type": "textLineWidget", "label": "Right Player", "jsonLocation": "right.playerName"},
                 {"type": "textLineWidget", "label": "Right Army", "jsonLocation": "right.armyName"},
                 {"type": "integerWidget", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
-                {"type": "integerWidget", "label": "Right Total Points", "jsonLocation": "right.totalPoints"}
+                {"type": "integerWidget", "label": "Right Total Points", "jsonLocation": "right.totalPoints"},
+                {"type": "comboWidget", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategy",
+                 "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
             ],
             "scoreWidgets": []
         }
@@ -58,13 +50,74 @@ class PlayerDetailsWidget(QWidget):
         # Left Player column
         leftColumn = QVBoxLayout()
         leftColumn.setAlignment(Qt.AlignTop)
+        # Main Left Widgets
         widgetHelpers.create_json_widgets(leftColumn, json_data, layoutData["mainLeftColumn"])
+
+        # Round widgets
+        leftTabs = QTabWidget()
+        # Round data
+        roundData = [
+            {"type": "integerWidget", "label": "Round {roundNum} Primary",
+             "jsonLocation": "left.aosRoundScores[{roundIndex}].primaryScore"},
+            {"type": "integerWidget", "label": "Round {roundNum} Secondary",
+             "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryScore"},
+            {"type": "comboWidget", "label": "Round {roundNum} Secondary",
+             "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
+             "itemFilterType": "battle tactic"},
+            {"type": "integerWidget", "label": "Round {roundNum} Bonus",
+             "jsonLocation": "left.aosRoundScores[{roundIndex}].bonusScore"},
+        ]
+        for i in range(5):
+            tab = QWidget()
+            tabLayout = QVBoxLayout()
+            curRoundData = copy.deepcopy(roundData)
+            for wData in curRoundData:
+                print(wData)
+                for key in wData.keys():
+                    print(wData[key])
+                    wData[key] = wData[key].format(roundNum=i+1, roundIndex=i)
+                    print(wData[key])
+            widgetHelpers.create_json_widgets(tabLayout, json_data, curRoundData)
+            tab.setLayout(tabLayout)
+            leftTabs.addTab(tab, "Round " + str(i+1) + " Scoring")
+        leftColumn.addWidget(leftTabs)
+
         layout.addLayout(leftColumn)
 
         # Right Player column
         rightColumn = QVBoxLayout()
         rightColumn.setAlignment(Qt.AlignTop)
         widgetHelpers.create_json_widgets(rightColumn, json_data, layoutData["mainRightColumn"])
+
+        # Round widgets
+        rightTabs = QTabWidget()
+        # Round data
+        roundData = [
+            {"type": "integerWidget", "label": "Round {roundNum} Primary",
+             "jsonLocation": "right.aosRoundScores[{roundIndex}].primaryScore"},
+            {"type": "integerWidget", "label": "Round {roundNum} Secondary",
+             "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryScore"},
+            {"type": "comboWidget", "label": "Round {roundNum} Secondary",
+             "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
+             "itemFilterType": "battle tactic"},
+            {"type": "integerWidget", "label": "Round {roundNum} Bonus",
+             "jsonLocation": "right.aosRoundScores[{roundIndex}].bonusScore"},
+        ]
+        for i in range(5):
+            tab = QWidget()
+            tabLayout = QVBoxLayout()
+            curRoundData = copy.deepcopy(roundData)
+            for wData in curRoundData:
+                print(wData)
+                for key in wData.keys():
+                    print(wData[key])
+                    wData[key] = wData[key].format(roundNum=i + 1, roundIndex=i)
+                    print(wData[key])
+            widgetHelpers.create_json_widgets(tabLayout, json_data, curRoundData)
+            tab.setLayout(tabLayout)
+            rightTabs.addTab(tab, "Round " + str(i + 1) + " Scoring")
+        rightColumn.addWidget(rightTabs)
+
         layout.addLayout(rightColumn)
 
         self.setLayout(layout)

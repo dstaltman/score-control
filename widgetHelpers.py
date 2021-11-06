@@ -25,11 +25,13 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
             layout.addWidget(textLineWidget)
             if use_list:
                 widget_list.append(textLineWidget)
+
         elif mainWidgetData["type"] == "integerWidget":
             intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(intWidget)
             if use_list:
                 widget_list.append(intWidget)
+
         elif mainWidgetData["type"] == "comboWidget":
             type_filter = None
             if "itemFilterType" in mainWidgetData:

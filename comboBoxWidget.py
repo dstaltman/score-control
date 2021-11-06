@@ -77,8 +77,6 @@ class ComboBoxWidget(QWidget):
         self.reset_items()
 
     def add_items(self):
-        print(self.out_json_data)
-        print("location: " + self.out_json_location)
         if isinstance(self.item_json_data, type(None)) or isinstance(self.item_json_location, type(None)):
             self.setEnabled(False)
             return
