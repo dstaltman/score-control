@@ -30,6 +30,10 @@ class ListObjectEditorWidget(QWidget):
         self.data = edit_data
         self.data_location = data_location
 
+        # If the data doesn't exist in the dictionary, create it
+        assert isinstance(self.data, dict)
+        if self.data_location not in self.data:
+            self.data[self.data_location] = []
         assert isinstance(self.data[self.data_location], list)
 
         self.data_list_label = QLabel(title)

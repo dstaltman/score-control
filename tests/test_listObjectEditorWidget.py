@@ -56,3 +56,10 @@ class TestListObjectEditorWidget:
         ]}
         widget = ListObjectEditorWidget("title", data, location, [])
         assert len(widget.item_lines) == 2
+
+    def test_data_empty(self):
+        data = {}
+        location = "key"
+        assert location not in data
+        widget = ListObjectEditorWidget("title", data, location, [])
+        assert location in data
