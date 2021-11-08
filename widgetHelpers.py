@@ -21,26 +21,26 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
     use_list = isinstance(widget_list, list)
     for mainWidgetData in data:
         if mainWidgetData["type"] == "textLineWidget":
-            textLineWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(textLineWidget)
+            text_line_widget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
+            layout.addWidget(text_line_widget)
             if use_list:
-                widget_list.append(textLineWidget)
+                widget_list.append(text_line_widget)
 
         elif mainWidgetData["type"] == "integerWidget":
-            intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(intWidget)
+            int_widget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
+            layout.addWidget(int_widget)
             if use_list:
-                widget_list.append(intWidget)
+                widget_list.append(int_widget)
 
         elif mainWidgetData["type"] == "comboWidget":
             type_filter = None
             if "itemFilterType" in mainWidgetData:
                 type_filter = mainWidgetData["itemFilterType"]
-            comboWidget = ComboBoxWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"],
-                                         json_data, mainWidgetData["itemsLocation"], type_filter=type_filter)
-            layout.addWidget(comboWidget)
+            combo_widget = ComboBoxWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"],
+                                          json_data, mainWidgetData["itemsLocation"], type_filter=type_filter)
+            layout.addWidget(combo_widget)
             if use_list:
-                widget_list.append(comboWidget)
+                widget_list.append(combo_widget)
 
         elif mainWidgetData["type"] == "separator":
             frame = QLabel(mainWidgetData["label"])

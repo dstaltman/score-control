@@ -35,12 +35,13 @@ class TestListObjectEditorWidget:
         assert widget.data_location == location
 
     def test_edit_creation(self):
-        widget = ListObjectEditorWidget("title", self.test_data, self.location, self.editor_layout)
-        assert len(widget.edit_widgets) == 2
+        create_widget = ListObjectEditorWidget("title", self.test_data, self.location, self.editor_layout)
+        # 2 in our layout, 1 in the default layout
+        assert len(create_widget.edit_widgets) == 3
 
-        assert isinstance(widget.active_object, type(None))
-        QTest.mouseClick(widget.item_lines[0].edit_button, Qt.LeftButton)
-        assert not isinstance(widget.active_object, type(None))
+        assert isinstance(create_widget.active_object, type(None))
+        QTest.mouseClick(create_widget.item_lines[0].edit_button, Qt.LeftButton)
+        assert not isinstance(create_widget.active_object, type(None))
 
     def test_populate_data(self):
         data = {"key": [

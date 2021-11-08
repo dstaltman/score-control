@@ -21,6 +21,11 @@ class ListObjectEditorWidget(QWidget):
     def __init__(self, title: str, edit_data: dict, data_location: str, editor_layout: list):
         super().__init__()
 
+        self.item_lines = []
+        self.edit_widgets = []
+        self.message_box = None
+        self.active_object = None
+
         self.layout = QHBoxLayout()
 
         # Left box with list of all objects to edit
@@ -129,14 +134,14 @@ class ListObjectEditorWidget(QWidget):
 
     @Slot()
     def delete_data_button(self, arg):
-        msgBox = QMessageBox()
-        msgBox.setText("Are you sure you would like to delete " + arg.object_data['name'] + "?")
-        msgBox.setInformativeText("This cannot be undone")
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msgBox.setDefaultButton(QMessageBox.No)
+        msg_box = QMessageBox()
+        msg_box.setText("Are you sure you would like to delete " + arg.object_data['name'] + "?")
+        msg_box.setInformativeText("This cannot be undone")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.No)
 
-        ret = msgBox.exec()
-        self.message_box = msgBox
+        ret = msg_box.exec()
+        self.message_box = msg_box
 
         if ret == QMessageBox.Yes:
             self.message_box = None
