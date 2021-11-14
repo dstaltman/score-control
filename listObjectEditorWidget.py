@@ -56,7 +56,7 @@ class ListObjectEditorWidget(QWidget):
 
         # Add widgets for the edit pane
         name_widget_data = {
-            'type': 'textLineWidget',
+            'type': 'text',
             'label': 'Object Name',
             'jsonLocation': 'name'
         }
@@ -165,12 +165,12 @@ if __name__ == "__main__":
     # layout for editor pane
     test_editor_layout = [
         {
-            'type': 'textLineWidget',
+            'type': 'text',
             'label': 'text widget',
             'jsonLocation': 'textValue'
         },
         {
-            'type': 'integerWidget',
+            'type': 'integer',
             'label': 'integer widget',
             'jsonLocation': 'intValue'
         }

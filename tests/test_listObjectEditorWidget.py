@@ -7,8 +7,8 @@ from PySide6.QtCore import Qt, QTimer
 class TestListObjectEditorWidget:
     app = None
     editor_layout = [
-        {'type': 'textLineWidget', 'label': 'text widget', 'jsonLocation': 'textValue'},
-        {'type': 'integerWidget', 'label': 'integer widget', 'jsonLocation': 'intValue'}
+        {'type': 'text', 'label': 'text widget', 'jsonLocation': 'textValue'},
+        {'type': 'integer', 'label': 'integer widget', 'jsonLocation': 'intValue'}
     ]
     test_data = {"key": [
         {"name": "Item Name 1", 'textValue': 'TEXT TEXT TEXT', 'intValue': 111}

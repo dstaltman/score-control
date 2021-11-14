@@ -11,28 +11,28 @@ from PySide6.QtCore import Qt
 # data contains information on how to create the widgets
 # Example:
 # {
-#     'type': <textLineWidget/integerWidget/comboWidget/separator>,
+#     'type': <text/integer/combo/separator>,
 #     'label': <widget label>,
 #     'jsonLocation': <whereToUpdate>,
-#     'itemsLocation': <whereItemsLive>, -- comboWidget
-#     'itemFilterType', <typeRequired>, -- comboWidget
+#     'itemsLocation': <whereItemsLive>, -- combo
+#     'itemFilterType', <typeRequired>, -- combo
 # }
 def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = None):
     use_list = isinstance(widget_list, list)
     for mainWidgetData in data:
-        if mainWidgetData["type"] == "textLineWidget":
+        if mainWidgetData["type"] == "text":
             textLineWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(textLineWidget)
             if use_list:
                 widget_list.append(textLineWidget)
 
-        elif mainWidgetData["type"] == "integerWidget":
+        elif mainWidgetData["type"] == "integer":
             intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(intWidget)
             if use_list:
                 widget_list.append(intWidget)
 
-        elif mainWidgetData["type"] == "comboWidget":
+        elif mainWidgetData["type"] == "combo":
             type_filter = None
             if "itemFilterType" in mainWidgetData:
                 type_filter = mainWidgetData["itemFilterType"]

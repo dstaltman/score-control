@@ -31,23 +31,25 @@ class PlayerDetailsWidget(QWidget):
 
         layoutData = {
             "mainLeftColumn": [
-                {"type": "textLineWidget", "label": "Left Player", "jsonLocation": "left.playerName"},
-                {'type': 'comboWidget', 'label': 'Left Army', 'jsonLocation': 'left.armyName',
+                {"type": "text", "label": "Left Player", "jsonLocation": "left.playerName"},
+                {'type': 'combo', 'label': 'Left Army', 'jsonLocation': 'left.armyName',
                  'itemsLocation': 'sigmarFactions'},
-                {"type": "integerWidget", "label": "Left Command Points", "jsonLocation": "left.commandPoints"},
-                {"type": "integerWidget", "label": "Left Total Points", "jsonLocation": "left.totalPoints"},
-                {"type": "comboWidget", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategy",
+                {"type": "integer", "label": "Left Command Points", "jsonLocation": "left.commandPoints"},
+                {"type": "integer", "label": "Left Total Points", "jsonLocation": "left.totalPoints"},
+                {"type": "combo", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategy",
                  "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
+                {"type": "integer", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategyScore"},
 
             ],
             "mainRightColumn": [
-                {"type": "textLineWidget", "label": "Right Player", "jsonLocation": "right.playerName"},
-                {'type': 'comboWidget', 'label': 'Right Army', 'jsonLocation': 'right.armyName',
+                {"type": "text", "label": "Right Player", "jsonLocation": "right.playerName"},
+                {'type': 'combo', 'label': 'Right Army', 'jsonLocation': 'right.armyName',
                  'itemsLocation': 'sigmarFactions'},
-                {"type": "integerWidget", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
-                {"type": "integerWidget", "label": "Right Total Points", "jsonLocation": "right.totalPoints"},
-                {"type": "comboWidget", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategy",
+                {"type": "integer", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
+                {"type": "integer", "label": "Right Total Points", "jsonLocation": "right.totalPoints"},
+                {"type": "combo", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategy",
                  "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
+                {"type": "integer", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategyScore"},
             ],
             "scoreWidgets": []
         }
@@ -65,14 +67,14 @@ class PlayerDetailsWidget(QWidget):
         leftTabs = QTabWidget()
         # Round data
         roundData = [
-            {"type": "integerWidget", "label": "Round {roundNum} Primary",
+            {"type": "integer", "label": "Round {roundNum} Primary",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].primaryScore"},
-            {"type": "integerWidget", "label": "Round {roundNum} Secondary",
+            {"type": "integer", "label": "Round {roundNum} Secondary",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryScore"},
-            {"type": "comboWidget", "label": "Round {roundNum} Secondary",
+            {"type": "combo", "label": "Round {roundNum} Secondary",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
              "itemFilterType": "battle tactic"},
-            {"type": "integerWidget", "label": "Round {roundNum} Bonus",
+            {"type": "integer", "label": "Round {roundNum} Bonus",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].bonusScore"},
         ]
         for i in range(5):
@@ -98,14 +100,14 @@ class PlayerDetailsWidget(QWidget):
         rightTabs = QTabWidget()
         # Round data
         roundData = [
-            {"type": "integerWidget", "label": "Round {roundNum} Primary",
+            {"type": "integer", "label": "Round {roundNum} Primary",
              "jsonLocation": "right.aosRoundScores[{roundIndex}].primaryScore"},
-            {"type": "integerWidget", "label": "Round {roundNum} Secondary",
+            {"type": "integer", "label": "Round {roundNum} Secondary",
              "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryScore"},
-            {"type": "comboWidget", "label": "Round {roundNum} Secondary",
+            {"type": "combo", "label": "Round {roundNum} Secondary",
              "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
              "itemFilterType": "battle tactic"},
-            {"type": "integerWidget", "label": "Round {roundNum} Bonus",
+            {"type": "integer", "label": "Round {roundNum} Bonus",
              "jsonLocation": "right.aosRoundScores[{roundIndex}].bonusScore"},
         ]
         for i in range(5):
@@ -198,9 +200,9 @@ class SigmarObjectivesEditor(QWidget):
     json_data = None
     json_location = None
     sigmar_obj_layout = [
-        {'type': 'textLineWidget', 'label': 'Objective Description', 'jsonLocation': 'description'},
-        {'type': 'integerWidget', 'label': 'Point Value', 'jsonLocation': 'pointValue'},
-        {'type': 'comboWidget', 'label': 'Objective Type', 'jsonLocation': 'type',
+        {'type': 'text', 'label': 'Objective Description', 'jsonLocation': 'description'},
+        {'type': 'integer', 'label': 'Point Value', 'jsonLocation': 'pointValue'},
+        {'type': 'combo', 'label': 'Objective Type', 'jsonLocation': 'type',
             'itemsLocation': 'sigmarObjectiveTypes'},
     ]
 
