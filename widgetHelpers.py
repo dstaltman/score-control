@@ -21,14 +21,14 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
     use_list = isinstance(widget_list, list)
     for mainWidgetData in data:
         if mainWidgetData["type"] == "text":
-            textLineWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(textLineWidget)
+            text_line_widget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
+            layout.addWidget(text_line_widget)
             if use_list:
                 widget_list.append(text_line_widget)
 
         elif mainWidgetData["type"] == "integer":
-            intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
-            layout.addWidget(intWidget)
+            int_widget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
+            layout.addWidget(int_widget)
             if use_list:
                 widget_list.append(int_widget)
 

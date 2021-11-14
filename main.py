@@ -66,7 +66,7 @@ class PlayerDetailsWidget(QWidget):
         # Round widgets
         left_tabs = QTabWidget()
         # Round data
-        roundData = [
+        round_data = [
             {"type": "integer", "label": "Round {roundNum} Primary",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].primaryScore"},
             {"type": "integer", "label": "Round {roundNum} Secondary",
