@@ -24,23 +24,23 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
             textLineWidget = TextToJsonWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(textLineWidget)
             if use_list:
-                widget_list.append(textLineWidget)
+                widget_list.append(text_line_widget)
 
         elif mainWidgetData["type"] == "integer":
             intWidget = IntegerWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"])
             layout.addWidget(intWidget)
             if use_list:
-                widget_list.append(intWidget)
+                widget_list.append(int_widget)
 
         elif mainWidgetData["type"] == "combo":
             type_filter = None
             if "itemFilterType" in mainWidgetData:
                 type_filter = mainWidgetData["itemFilterType"]
-            comboWidget = ComboBoxWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"],
-                                         json_data, mainWidgetData["itemsLocation"], type_filter=type_filter)
-            layout.addWidget(comboWidget)
+            combo_widget = ComboBoxWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"],
+                                          json_data, mainWidgetData["itemsLocation"], type_filter=type_filter)
+            layout.addWidget(combo_widget)
             if use_list:
-                widget_list.append(comboWidget)
+                widget_list.append(combo_widget)
 
         elif mainWidgetData["type"] == "separator":
             frame = QLabel(mainWidgetData["label"])

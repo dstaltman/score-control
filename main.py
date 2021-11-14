@@ -29,7 +29,7 @@ class PlayerDetailsWidget(QWidget):
     def __init__(self, json_data: dict):
         QWidget.__init__(self)
 
-        layoutData = {
+        layout_data = {
             "mainLeftColumn": [
                 {"type": "text", "label": "Left Player", "jsonLocation": "left.playerName"},
                 {'type': 'combo', 'label': 'Left Army', 'jsonLocation': 'left.armyName',
@@ -58,13 +58,13 @@ class PlayerDetailsWidget(QWidget):
         layout = QHBoxLayout()
 
         # Left Player column
-        leftColumn = QVBoxLayout()
-        leftColumn.setAlignment(Qt.AlignTop)
+        left_column = QVBoxLayout()
+        left_column.setAlignment(Qt.AlignTop)
         # Main Left Widgets
-        widgetHelpers.create_json_widgets(leftColumn, json_data, layoutData["mainLeftColumn"])
+        widgetHelpers.create_json_widgets(left_column, json_data, layout_data["mainLeftColumn"])
 
         # Round widgets
-        leftTabs = QTabWidget()
+        left_tabs = QTabWidget()
         # Round data
         roundData = [
             {"type": "integer", "label": "Round {roundNum} Primary",
@@ -79,25 +79,25 @@ class PlayerDetailsWidget(QWidget):
         ]
         for i in range(5):
             tab = QWidget()
-            tabLayout = QVBoxLayout()
-            curRoundData = copy.deepcopy(roundData)
-            for wData in curRoundData:
+            tab_layout = QVBoxLayout()
+            cur_round_data = copy.deepcopy(round_data)
+            for wData in cur_round_data:
                 for key in wData.keys():
                     wData[key] = wData[key].format(roundNum=i+1, roundIndex=i)
-            widgetHelpers.create_json_widgets(tabLayout, json_data, curRoundData)
-            tab.setLayout(tabLayout)
-            leftTabs.addTab(tab, "Round " + str(i+1) + " Scoring")
-        leftColumn.addWidget(leftTabs)
+            widgetHelpers.create_json_widgets(tab_layout, json_data, cur_round_data)
+            tab.setLayout(tab_layout)
+            left_tabs.addTab(tab, "Round " + str(i+1) + " Scoring")
+        left_column.addWidget(left_tabs)
 
-        layout.addLayout(leftColumn)
+        layout.addLayout(left_column)
 
         # Right Player column
-        rightColumn = QVBoxLayout()
-        rightColumn.setAlignment(Qt.AlignTop)
-        widgetHelpers.create_json_widgets(rightColumn, json_data, layoutData["mainRightColumn"])
+        right_column = QVBoxLayout()
+        right_column.setAlignment(Qt.AlignTop)
+        widgetHelpers.create_json_widgets(right_column, json_data, layout_data["mainRightColumn"])
 
         # Round widgets
-        rightTabs = QTabWidget()
+        right_tabs = QTabWidget()
         # Round data
         roundData = [
             {"type": "integer", "label": "Round {roundNum} Primary",
@@ -112,17 +112,17 @@ class PlayerDetailsWidget(QWidget):
         ]
         for i in range(5):
             tab = QWidget()
-            tabLayout = QVBoxLayout()
-            curRoundData = copy.deepcopy(roundData)
-            for wData in curRoundData:
+            tab_layout = QVBoxLayout()
+            cur_round_data = copy.deepcopy(round_data)
+            for wData in cur_round_data:
                 for key in wData.keys():
                     wData[key] = wData[key].format(roundNum=i + 1, roundIndex=i)
-            widgetHelpers.create_json_widgets(tabLayout, json_data, curRoundData)
-            tab.setLayout(tabLayout)
-            rightTabs.addTab(tab, "Round " + str(i + 1) + " Scoring")
-        rightColumn.addWidget(rightTabs)
+            widgetHelpers.create_json_widgets(tab_layout, json_data, cur_round_data)
+            tab.setLayout(tab_layout)
+            right_tabs.addTab(tab, "Round " + str(i + 1) + " Scoring")
+        right_column.addWidget(right_tabs)
 
-        layout.addLayout(rightColumn)
+        layout.addLayout(right_column)
 
         self.setLayout(layout)
 
@@ -250,6 +250,7 @@ class ScoreControl(QMainWindow):
     score_details = None
     sigmar_objectives = None
 
+    # noinspection PyTypeChecker
     def __init__(self):
         QMainWindow.__init__(self)
         self.setWindowTitle("Score Control")
@@ -269,11 +270,11 @@ class ScoreControl(QMainWindow):
         # If we have a valid file, load widget otherwise show file loader
         self.score_details = ScoreDetailsWidget()
         if self.fileManager.is_valid():
-            playerWidget = PlayerDetailsWidget(self.json_data)
-            self.score_details.set_body_widget(playerWidget)
+            player_widget = PlayerDetailsWidget(self.json_data)
+            self.score_details.set_body_widget(player_widget)
         else:
-            loadWidget = LoadFileWidget("Load File", self.file_selected)
-            self.score_details.set_body_widget(loadWidget)
+            load_widget = LoadFileWidget("Load File", self.file_selected)
+            self.score_details.set_body_widget(load_widget)
         self.tab_widget.addTab(self.score_details, "Score Control")
 
         # AoS Objective Editor
@@ -302,8 +303,8 @@ class ScoreControl(QMainWindow):
         # If we have a valid file, load default widget
         if self.fileManager.is_valid():
             self.json_data = self.fileManager.get_json_data()
-            playerWidget = PlayerDetailsWidget(self.json_data)
-            self.score_details.set_body_widget(playerWidget)
+            player_widget = PlayerDetailsWidget(self.json_data)
+            self.score_details.set_body_widget(player_widget)
             self.sigmar_objectives.set_json_data(self.json_data)
             ee.emit("json_loaded", self.json_data)
 

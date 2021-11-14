@@ -41,7 +41,7 @@ class ComboBoxWidget(QWidget):
 
         # Combo box
         self.comboBox = QComboBox()
-        self.add_items()
+        self.reset_items()
         self.comboBox.activated.connect(self.selection_changed)
         layout.addWidget(self.comboBox)
 
