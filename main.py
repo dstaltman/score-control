@@ -35,7 +35,6 @@ class PlayerDetailsWidget(QWidget):
                 {'type': 'combo', 'label': 'Left Army', 'jsonLocation': 'left.armyName',
                  'itemsLocation': 'sigmarFactions'},
                 {"type": "integer", "label": "Left Command Points", "jsonLocation": "left.commandPoints"},
-                {"type": "integer", "label": "Left Total Points", "jsonLocation": "left.totalPoints"},
                 {"type": "combo", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategy",
                  "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
                 {"type": "integer", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategyScore"},
@@ -46,7 +45,6 @@ class PlayerDetailsWidget(QWidget):
                 {'type': 'combo', 'label': 'Right Army', 'jsonLocation': 'right.armyName',
                  'itemsLocation': 'sigmarFactions'},
                 {"type": "integer", "label": "Right Command Points", "jsonLocation": "right.commandPoints"},
-                {"type": "integer", "label": "Right Total Points", "jsonLocation": "right.totalPoints"},
                 {"type": "combo", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategy",
                  "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
                 {"type": "integer", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategyScore"},
@@ -66,7 +64,7 @@ class PlayerDetailsWidget(QWidget):
         # Round widgets
         left_tabs = QTabWidget()
         # Round data
-        round_data = [
+        left_round_data = [
             {"type": "integer", "label": "Round {roundNum} Primary",
              "jsonLocation": "left.aosRoundScores[{roundIndex}].primaryScore"},
             {"type": "integer", "label": "Round {roundNum} Secondary",
@@ -80,7 +78,7 @@ class PlayerDetailsWidget(QWidget):
         for i in range(5):
             tab = QWidget()
             tab_layout = QVBoxLayout()
-            cur_round_data = copy.deepcopy(round_data)
+            cur_round_data = copy.deepcopy(left_round_data)
             for wData in cur_round_data:
                 for key in wData.keys():
                     wData[key] = wData[key].format(roundNum=i+1, roundIndex=i)
@@ -99,7 +97,7 @@ class PlayerDetailsWidget(QWidget):
         # Round widgets
         right_tabs = QTabWidget()
         # Round data
-        roundData = [
+        right_round_data = [
             {"type": "integer", "label": "Round {roundNum} Primary",
              "jsonLocation": "right.aosRoundScores[{roundIndex}].primaryScore"},
             {"type": "integer", "label": "Round {roundNum} Secondary",
@@ -113,7 +111,7 @@ class PlayerDetailsWidget(QWidget):
         for i in range(5):
             tab = QWidget()
             tab_layout = QVBoxLayout()
-            cur_round_data = copy.deepcopy(round_data)
+            cur_round_data = copy.deepcopy(right_round_data)
             for wData in cur_round_data:
                 for key in wData.keys():
                     wData[key] = wData[key].format(roundNum=i + 1, roundIndex=i)
