@@ -95,6 +95,19 @@ class IntegerWidgetTestCase(unittest.TestCase):
         self.assertEqual("", widget.textBox.text())
         self.assertFalse(widget.isEnabled())
 
+    def test_reset_data(self):
+        data = {"index": 10}
+        widget = IntegerWidget("integer", data, "index", reset_value=0)
+
+        self.assertEqual("10", widget.textBox.text())
+        self.assertTrue(widget.isEnabled())
+
+        widget.reset_data()
+
+        self.assertEqual("0", widget.textBox.text())
+        self.assertEqual(0, widget.jsonBlob["index"])
+
+
 
 if __name__ == '__main__':
     unittest.main()

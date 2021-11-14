@@ -93,6 +93,20 @@ class TestTextToJsonWidget(unittest.TestCase):
         self.assertEqual("", widget.textBox.text())
         self.assertFalse(widget.isEnabled())
 
+    def test_reset_data(self):
+        index = "index"
+        value = "value"
+        data = {index: value}
+        widget = TextToJsonWidget(self._label, data, index, reset_value="newone")
+
+        self.assertEqual(value, widget.textBox.text())
+
+        widget.reset_data()
+
+        # typing in the text box will append to existing string
+        self.assertEqual("newone", widget.textBox.text())
+        self.assertEqual({index: "newone"}, widget.jsonBlob)
+
 
 if __name__ == '__main__':
     unittest.main()

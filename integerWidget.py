@@ -10,11 +10,12 @@ from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QL
 #
 # Can control the integer with a text box or buttons to increment and decrement.
 class IntegerWidget(QWidget):
-    def __init__(self, label: str, json_blob: dict, json_location: str):
+    def __init__(self, label: str, json_blob: dict, json_location: str, reset_value=None):
         super().__init__()
         self.label = label
         self.jsonBlob = json_blob
         self.jsonLocation = json_location
+        self.reset_value = reset_value
 
         layout = QHBoxLayout()
         self.label = QLabel(label)
@@ -97,6 +98,21 @@ class IntegerWidget(QWidget):
         # truth is the text line value
         val = int(self.textBox.text())
         pydash.set_(self.jsonBlob, self.jsonLocation, val)
+
+    def reset_data(self):
+        if self.reset_value is None:
+            return
+
+        reset_string = None
+        if type(self.reset_value) is int:
+            reset_string = str(self.reset_value)
+        elif type(self.reset_value) is str:
+            reset_string = self.reset_value
+
+        assert(reset_string is not None)
+
+        self.textBox.setText(reset_string)
+        self.set_json_value()
 
     @Slot()
     def minus_one_pressed(self):

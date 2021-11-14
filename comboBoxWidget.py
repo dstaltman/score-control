@@ -13,9 +13,10 @@ class ComboBoxWidget(QWidget):
     out_json_location = None
     num_items = 0
     filter_func = None
+    reset_value = None
 
     def __init__(self, label: str, out_json_data: dict, out_json_location: str, item_json_data: dict,
-                 item_json_location: str, filter_func=None, type_filter=None):
+                 item_json_location: str, filter_func=None, type_filter=None, reset_value=None):
         QWidget.__init__(self)
 
         self.item_json_data = item_json_data
@@ -27,6 +28,7 @@ class ComboBoxWidget(QWidget):
         self.type_filter = type_filter
         if isinstance(self.type_filter, str):
             self.set_type_filter(self.type_filter)
+        self.reset_value = reset_value
 
         # Assert on requirements
         assert isinstance(self.item_json_location, str)
@@ -97,6 +99,13 @@ class ComboBoxWidget(QWidget):
 
         if not current_item_found:
             self.current_item = self.comboBox.currentText()
+
+    def reset_data(self):
+        if not isinstance(self.reset_value, type(None)):
+            reset_index = self.comboBox.findText(self.reset_value)
+            if reset_index >= 0:
+                self.comboBox.setCurrentIndex(reset_index)
+                self.selection_changed()
 
 
 if __name__ == "__main__":

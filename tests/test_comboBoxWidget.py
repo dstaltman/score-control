@@ -80,3 +80,23 @@ class TestComboBoxWidget:
         # When we have no data, set the data to the first item in the list
         assert widget.comboBox.currentText() == 'Item 1'
         assert widget.current_item == 'Item 1'
+
+    def test_reset_button(self):
+        widget = ComboBoxWidget("label", self.output, self.output_location, self.input_items, self.input_location,
+                                reset_value='Item 1')
+
+        # We have 3 selected now
+        assert widget.comboBox.currentText() == 'Item 3'
+        assert widget.current_item == 'Item 3'
+
+        # Reset data
+        widget.reset_data()
+
+        assert widget.current_item == 'Item 1'
+        assert widget.comboBox.currentText() == 'Item 1'
+
+        # don't change value if reset value is invalid
+        widget.reset_value = 'Item 5'
+
+        assert widget.current_item == 'Item 1'
+        assert widget.comboBox.currentText() == 'Item 1'

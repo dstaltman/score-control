@@ -8,13 +8,14 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QLabel, QApplicat
 
 
 class TextToJsonWidget(QWidget):
-    def __init__(self, label: str, json_blob: dict, json_location: str, data_type=str):
+    def __init__(self, label: str, json_blob: dict, json_location: str, data_type=str, reset_value=None):
         QWidget.__init__(self)
 
         self.jsonLocation = json_location
         self.jsonBlob = json_blob
         self.text = ""
         self.dataType = data_type
+        self.reset_value = reset_value
 
         layout = QHBoxLayout()
         self.labelWidget = QLabel(label)
@@ -59,6 +60,15 @@ class TextToJsonWidget(QWidget):
     def set_data(self, json_data):
         self.jsonBlob = json_data
         self.read_blob_contents()
+
+    def reset_data(self):
+        if self.reset_value is None:
+            return
+
+        assert(type(self.reset_value) is str)
+
+        self.textBox.setText(self.reset_value)
+        self.text_changed(self.reset_value)
 
     @Slot()
     def text_changed(self, text):
