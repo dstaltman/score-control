@@ -42,9 +42,12 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
             type_filter = None
             if "itemFilterType" in mainWidgetData:
                 type_filter = mainWidgetData["itemFilterType"]
+            filterFunc = None
+            if "filterFunc" in mainWidgetData:
+                filterFunc = mainWidgetData["filterFunc"]
             combo_widget = ComboBoxWidget(mainWidgetData["label"], json_data, mainWidgetData["jsonLocation"],
                                           json_data, mainWidgetData["itemsLocation"], type_filter=type_filter,
-                                          reset_value=reset_value)
+                                          reset_value=reset_value, filter_func=filterFunc)
             layout.addWidget(combo_widget)
             if use_list:
                 widget_list.append(combo_widget)

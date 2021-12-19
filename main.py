@@ -13,6 +13,7 @@ from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QLabel, \
     QPushButton, QGridLayout
 from PySide6.QtCore import Qt
+import pydash
 from pymitter import EventEmitter
 
 import widgetHelpers
@@ -26,6 +27,11 @@ ee = EventEmitter()
 
 
 # Has all the stuff for AoS player data
+def build_field_test(item_json_location: str, json_blob: dict, dict_json_location: str):
+    return lambda item: item_json_location in item and item[item_json_location] \
+                        in [None, "", "None", pydash.get(json_blob, dict_json_location)]
+
+
 class PlayerDetailsWidget(QWidget):
     # Global Layout Data
     layout_data = {
@@ -35,7 +41,7 @@ class PlayerDetailsWidget(QWidget):
              "itemsLocation": "sigmarFactions"},
             {"type": "integer", "label": "Left Command Points", "jsonLocation": "left.commandPoints", "resetValue": 0},
             {"type": "combo", "label": "Left Grand Strategy", "jsonLocation": "left.grandStrategyName",
-             "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
+             "itemsLocation": "sigmarGrandStrategies", "filterFunc": lambda: True},
             {"type": "integer", "label": "Grand Strategy Score", "jsonLocation": "left.grandStrategyScore",
              "resetValue": 0},
 
@@ -47,7 +53,7 @@ class PlayerDetailsWidget(QWidget):
             {"type": "integer", "label": "Right Command Points", "jsonLocation": "right.commandPoints",
              "resetValue": 0},
             {"type": "combo", "label": "Right Grand Strategy", "jsonLocation": "right.grandStrategyName",
-             "itemsLocation": "sigmarObjectives", "itemFilterType": "grand strategy"},
+             "itemsLocation": "sigmarGrandStrategies", "filterFunc": lambda: True},
             {"type": "integer", "label": "Grand Strategy Score", "jsonLocation": "right.grandStrategyScore",
              "resetValue": 0},
         ]
@@ -60,8 +66,8 @@ class PlayerDetailsWidget(QWidget):
         {"type": "integer", "label": "Round {roundNum} Secondary",
          "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryScore", "resetValue": 0},
         {"type": "combo", "label": "Round {roundNum} Secondary",
-         "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
-         "itemFilterType": "battle tactic", "resetValue": "------"},
+         "jsonLocation": "left.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarBattleTraits",
+         "resetValue": "------", "filterFunc": lambda: True},
         {"type": "integer", "label": "Round {roundNum} Bonus",
          "jsonLocation": "left.aosRoundScores[{roundIndex}].bonusScore", "resetValue": 0},
     ]
@@ -71,8 +77,8 @@ class PlayerDetailsWidget(QWidget):
         {"type": "integer", "label": "Round {roundNum} Secondary",
          "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryScore", "resetValue": 0},
         {"type": "combo", "label": "Round {roundNum} Secondary",
-         "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarObjectives",
-         "itemFilterType": "battle tactic", "resetValue": "------"},
+         "jsonLocation": "right.aosRoundScores[{roundIndex}].secondaryName", "itemsLocation": "sigmarBattleTraits",
+         "resetValue": "------", "filterFunc": lambda: True},
         {"type": "integer", "label": "Round {roundNum} Bonus",
          "jsonLocation": "right.aosRoundScores[{roundIndex}].bonusScore", "resetValue": 0},
     ]
@@ -81,6 +87,28 @@ class PlayerDetailsWidget(QWidget):
         QWidget.__init__(self)
 
         self.widget_list = []
+
+        # Update Widgets lists - replace parts of the lists as needed to be more programmatic (seems shitty)
+        left_edit_lists = [
+            self.layout_data["mainLeftColumn"],
+            self.left_round_data
+        ]
+        for widgetList in left_edit_lists:
+            for widgetData in widgetList:
+                if "filterFunc" not in widgetData:
+                    continue
+                if callable(widgetData["filterFunc"]):
+                    widgetData["filterFunc"] = build_field_test("armyType", json_data, "left.armyName")
+        right_edit_lists = [
+            self.layout_data["mainRightColumn"],
+            self.right_round_data
+        ]
+        for widgetList in right_edit_lists:
+            for widgetData in widgetList:
+                if "filterFunc" not in widgetData:
+                    continue
+                if callable(widgetData["filterFunc"]):
+                    widgetData["filterFunc"] = build_field_test("armyType", json_data, "right.armyName")
 
         # Setup all the widgets in the layout
         layout = QGridLayout()
@@ -94,6 +122,7 @@ class PlayerDetailsWidget(QWidget):
         # Left Player column
         left_column = QVBoxLayout()
         left_column.setAlignment(Qt.AlignTop)
+
         # Main Left Widgets
         widgetHelpers.create_json_widgets(left_column, json_data, self.layout_data["mainLeftColumn"], self.widget_list)
 
@@ -145,7 +174,6 @@ class PlayerDetailsWidget(QWidget):
             widget.reset_data()
 
 
-
 class ScoreDetailsWidget(QWidget):
     body_widget = None
     body_layout = None
@@ -170,7 +198,7 @@ class SigmarFactionsEditor(QWidget):
     body_layout = None
     json_data = None
     json_location = None
-    sigmar_obj_layout = []
+    sigmar_fac_layout = []
 
     def __init__(self, json_data, json_location):
         super().__init__()
@@ -200,7 +228,7 @@ class SigmarFactionsEditor(QWidget):
             self.body_layout.removeWidget(self.body_widget)
 
         sig_obj_list = ListObjectEditorWidget("AoS Factions", self.json_data, self.json_location,
-                                              self.sigmar_obj_layout)
+                                              self.sigmar_fac_layout)
         self.body_widget = sig_obj_list
         self.body_layout.addWidget(sig_obj_list)
 
@@ -213,16 +241,16 @@ class SigmarFactionsEditor(QWidget):
         self.body_layout.addWidget(w)
 
 
-class SigmarObjectivesEditor(QWidget):
+class SigmarGrandStrategyEditor(QWidget):
     body_widget = None
     body_layout = None
     json_data = None
     json_location = None
     sigmar_obj_layout = [
-        {"type": "text", "label": "Objective Description", "jsonLocation": "description"},
+        {"type": "text", "label": "Description", "jsonLocation": "description"},
         {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
-        {"type": "combo", "label": "Objective Type", "jsonLocation": "type",
-            "itemsLocation": "sigmarObjectiveTypes"},
+        {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
+         "itemsLocation": "sigmarFactions"},
     ]
 
     def __init__(self, json_data, json_location):
@@ -246,7 +274,54 @@ class SigmarObjectivesEditor(QWidget):
             self.body_widget.hide()
             self.body_layout.removeWidget(self.body_widget)
 
-        sig_obj_list = ListObjectEditorWidget("AoS Objectives", self.json_data, self.json_location,
+        sig_obj_list = ListObjectEditorWidget("Grand Strategies", self.json_data, self.json_location,
+                                              self.sigmar_obj_layout)
+        self.body_widget = sig_obj_list
+        self.body_layout.addWidget(sig_obj_list)
+
+    def setup_missing_widget(self):
+        if not isinstance(self.body_widget, type(None)):
+            self.body_layout.removeWidget(self.body_widget)
+
+        w = QLabel("File not loaded. Please load file in first tab to start editing!")
+        self.body_widget = w
+        self.body_layout.addWidget(w)
+
+
+class SigmarBattleTraitEditor(QWidget):
+    body_widget = None
+    body_layout = None
+    json_data = None
+    json_location = None
+    sigmar_obj_layout = [
+        {"type": "text", "label": "Battle Trait Description", "jsonLocation": "description"},
+        {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
+        {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
+            "itemsLocation": "sigmarFactions"},
+    ]
+
+    def __init__(self, json_data, json_location):
+        super().__init__()
+        self.body_layout = QVBoxLayout()
+        self.setLayout(self.body_layout)
+
+        self.json_data = json_data
+        self.json_location = json_location
+        if isinstance(json_data, type(None)):
+            self.setup_missing_widget()
+        else:
+            self.setup_editor_widget()
+
+    def set_json_data(self, json_data):
+        self.json_data = json_data
+        self.setup_editor_widget()
+
+    def setup_editor_widget(self):
+        if not isinstance(self.body_widget, type(None)):
+            self.body_widget.hide()
+            self.body_layout.removeWidget(self.body_widget)
+
+        sig_obj_list = ListObjectEditorWidget("Battle Traits", self.json_data, self.json_location,
                                               self.sigmar_obj_layout)
         self.body_widget = sig_obj_list
         self.body_layout.addWidget(sig_obj_list)
@@ -267,7 +342,8 @@ class ScoreControl(QMainWindow):
     fileManager = None
     json_data = None
     score_details = None
-    sigmar_objectives = None
+    sigmar_battle_traits = None
+    sigmar_grand_strategies = None
 
     # noinspection PyTypeChecker
     def __init__(self):
@@ -296,9 +372,13 @@ class ScoreControl(QMainWindow):
             self.score_details.set_body_widget(load_widget)
         self.tab_widget.addTab(self.score_details, "Score Control")
 
-        # AoS Objective Editor
-        self.sigmar_objectives = SigmarObjectivesEditor(self.json_data, "sigmarObjectives")
-        self.tab_widget.addTab(self.sigmar_objectives, "Sigmar Objective Editor")
+        # AoS Grand Strategy Editor
+        self.sigmar_grand_strategies = SigmarGrandStrategyEditor(self.json_data, "sigmarGrandStrategies")
+        self.tab_widget.addTab(self.sigmar_grand_strategies, "Sigmar Grand Strategies")
+
+        # AoS Battle Traits Editor
+        self.sigmar_battle_traits = SigmarBattleTraitEditor(self.json_data, "sigmarBattleTraits")
+        self.tab_widget.addTab(self.sigmar_battle_traits, "Sigmar Battle Traits")
 
         # AoS Faction Editor
         self.sigmar_factions = SigmarFactionsEditor(self.json_data, "sigmarFactions")
@@ -324,7 +404,8 @@ class ScoreControl(QMainWindow):
             self.json_data = self.fileManager.get_json_data()
             player_widget = PlayerDetailsWidget(self.json_data)
             self.score_details.set_body_widget(player_widget)
-            self.sigmar_objectives.set_json_data(self.json_data)
+            self.sigmar_battle_traits.set_json_data(self.json_data)
+            self.sigmar_grand_strategies.set_json_data(self.json_data)
             ee.emit("json_loaded", self.json_data)
 
     @Slot()
