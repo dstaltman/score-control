@@ -197,5 +197,3 @@ cython_debug/
 testdata.json
 .idea/vcs.xml
 *.json
-.idea/scoreCtrl.iml
-.idea/misc.xml
