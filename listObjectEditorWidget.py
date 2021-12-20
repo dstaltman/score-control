@@ -4,7 +4,7 @@ import pydash
 import widgetHelpers
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QApplication, \
-    QSizePolicy, QFrame, QMessageBox
+    QSizePolicy, QFrame, QMessageBox, QScrollArea
 
 
 # Widget that displays a list of objects to be edited
@@ -26,12 +26,38 @@ class ListObjectEditorWidget(QWidget):
         self.message_box = None
         self.active_object = None
 
-        self.layout = QHBoxLayout()
-
         # Left box with list of all objects to edit
+        self.left_widget = QWidget()
+        self.left_scroll = QScrollArea()
         self.left_layout = QVBoxLayout()
-        self.left_layout.setAlignment(Qt.AlignTop)
+        self.left_widget.setLayout(self.left_layout)
 
+        # Scroll Area Properties
+        self.left_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.left_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.left_layout.setAlignment(Qt.AlignTop)
+        self.left_scroll.setMinimumSize(350, 200)
+        self.left_scroll.setWidgetResizable(True)
+        self.left_scroll.setWidget(self.left_widget)
+
+        # Right box that contains all the fields to edit in an object instance
+        self.right_widget = QWidget()
+        self.right_layout = QVBoxLayout()
+        self.right_layout.setAlignment(Qt.AlignTop)
+        self.right_widget.setLayout(self.right_layout)
+
+        self.editor_label = (QLabel("Data Editor"))
+        self.editor_label.setAlignment(Qt.AlignHCenter)
+        self.right_layout.addWidget(self.editor_label)
+
+        # Main Layout
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.left_scroll)
+        self.layout.addWidget(self.right_widget)
+
+        # Initialize data and finalize the widget
         self.data = edit_data
         self.data_location = data_location
 
@@ -49,16 +75,6 @@ class ListObjectEditorWidget(QWidget):
         self.add_object_button.clicked.connect(self.add_object)
         self.left_layout.addWidget(self.add_object_button)
 
-        self.layout.addLayout(self.left_layout)
-
-        # Right box that contains all the fields to edit in an object instance
-        self.right_layout = QVBoxLayout()
-        self.right_layout.setAlignment(Qt.AlignTop)
-
-        self.editor_label = (QLabel("Data Editor"))
-        self.editor_label.setAlignment(Qt.AlignHCenter)
-        self.right_layout.addWidget(self.editor_label)
-
         # Add widgets for the edit pane
         name_widget_data = {
             'type': 'text',
@@ -68,12 +84,7 @@ class ListObjectEditorWidget(QWidget):
         editor_layout.insert(0, name_widget_data)
         widgetHelpers.create_json_widgets(self.right_layout, self.data, editor_layout, self.edit_widgets)
 
-        self.layout.addLayout(self.right_layout)
-
-        # Initialize data and finalize the widget
         self.populate_editor_data()
-
-        self.setLayout(self.layout)
 
     def populate_editor_data(self):
         self.item_lines.clear()
