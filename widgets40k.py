@@ -14,23 +14,43 @@ from PySide6.QtCore import Qt
 from listObjectEditorWidget import ListObjectEditorWidget
 
 
+# Layouts for various WidgetDataLoaders
+primary_objectives_layout = [
+    {"type": "text", "label": "Description", "jsonLocation": "description"},
+]
+secondary_objectives_layout = [
+    {"type": "text", "label": "Description", "jsonLocation": "description"},
+    {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
+     "itemsLocation": "40kFactions"},
+]
+faction_layout = [
+    {"type": "text", "label": "Description", "jsonLocation": "description"},
+]
+
+
+# Static function to setup all the widgets used in editing 40k
 def setup_40k_windows(json_data, tab_widget, score_details, ee):
     player_widget = PlayerDetailsWidget(json_data, ee)
     score_details.set_body_widget(player_widget)
 
     # 40k Primary Missions
-    primary_objectives = PrimaryObjectivesEditor(json_data, "40kPrimaryObjectives", ee)
+    primary_objectives = ListObjectEditorWidget("40K Primary Objectives Editor", json_data,
+                                                "40kPrimaryObjectives",
+                                                primary_objectives_layout)
     tab_widget.addTab(primary_objectives, "40K Primary Objectives")
 
     # 40k Secondary Objectives
-    secondary_objectives = SecondaryObjectivesEditor(json_data, "40kSecondaryObjectives", ee)
+    secondary_objectives = ListObjectEditorWidget("40K Secondary Objectives Editor", json_data,
+                                                  "40kSecondaryObjectives",
+                                                  secondary_objectives_layout)
     tab_widget.addTab(secondary_objectives, "40K Secondary Objectives")
 
     # 40k Faction Editor
-    factions = FactionsEditor(json_data, "40kFactions", ee)
+    factions = ListObjectEditorWidget("40K Factions Editor", json_data, "40kFactions", faction_layout)
     tab_widget.addTab(factions, "40K Factions Editor")
 
 
+# Class to handle scoring for 40k
 class PlayerDetailsWidget(QWidget):
     # Global Layout Data
     layout_data = {
@@ -179,144 +199,3 @@ class PlayerDetailsWidget(QWidget):
     def reset_scores(self):
         for widget in self.widget_list:
             widget.reset_data()
-
-
-class FactionsEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    fac_layout = [
-        {"type": "text", "label": "Description", "jsonLocation": "description"},
-    ]
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-
-        def json_data_handler(in_data):
-            print("Json Data Handler Called")
-            self.set_json_data(in_data)
-
-        ee.on("json_loaded", json_data_handler)
-
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        fac_list = ListObjectEditorWidget("40k Factions", self.json_data, self.json_location,
-                                          self.fac_layout)
-        self.body_widget = fac_list
-        self.body_layout.addWidget(fac_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)
-
-
-class PrimaryObjectivesEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    obj_layout = [
-        {"type": "text", "label": "Description", "jsonLocation": "description"},
-    ]
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        sig_obj_list = ListObjectEditorWidget("Grand Strategies", self.json_data, self.json_location,
-                                              self.obj_layout)
-        self.body_widget = sig_obj_list
-        self.body_layout.addWidget(sig_obj_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)
-
-
-class SecondaryObjectivesEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    obj_layout = [
-        {"type": "text", "label": "Description", "jsonLocation": "description"},
-        {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
-         "itemsLocation": "40kFactions"},
-    ]
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        sig_obj_list = ListObjectEditorWidget("Secondary Editor", self.json_data, self.json_location,
-                                              self.obj_layout)
-        self.body_widget = sig_obj_list
-        self.body_layout.addWidget(sig_obj_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)

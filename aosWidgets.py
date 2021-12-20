@@ -20,20 +20,37 @@ from PySide6.QtCore import Qt
 from listObjectEditorWidget import ListObjectEditorWidget
 
 
+# Layouts for various WidgetDataLoaders
+faction_layout = []
+grand_strategy_layout = [
+    {"type": "text", "label": "Description", "jsonLocation": "description"},
+    {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
+    {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
+     "itemsLocation": "sigmarFactions"},
+]
+battle_trait_layout = [
+    {"type": "text", "label": "Battle Trait Description", "jsonLocation": "description"},
+    {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
+    {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
+     "itemsLocation": "sigmarFactions"},
+]
+
+
 def setup_sigmar_windows(json_data, tab_widget, score_details, ee):
     player_widget = SigmarPlayerDetailsWidget(json_data, ee)
     score_details.set_body_widget(player_widget)
 
     # AoS Grand Strategy Editor
-    sigmar_grand_strategies = SigmarGrandStrategyEditor(json_data, "sigmarGrandStrategies", ee)
+    sigmar_grand_strategies = ListObjectEditorWidget("Grand Strategies", json_data, "sigmarGrandStrategies",
+                                                     grand_strategy_layout)
     tab_widget.addTab(sigmar_grand_strategies, "Sigmar Grand Strategies")
 
     # AoS Battle Traits Editor
-    sigmar_battle_traits = SigmarBattleTraitEditor(json_data, "sigmarBattleTraits", ee)
+    sigmar_battle_traits = ListObjectEditorWidget("Battle Traits", json_data, "sigmarBattleTraits", battle_trait_layout)
     tab_widget.addTab(sigmar_battle_traits, "Sigmar Battle Traits")
 
     # AoS Faction Editor
-    sigmar_factions = SigmarFactionsEditor(json_data, "sigmarFactions", ee)
+    sigmar_factions = ListObjectEditorWidget("Factions", json_data, "sigmarFactions", faction_layout)
     tab_widget.addTab(sigmar_factions, "Sigmar Factions Editor")
 
 
@@ -177,145 +194,3 @@ class SigmarPlayerDetailsWidget(QWidget):
     def reset_scores(self):
         for widget in self.widget_list:
             widget.reset_data()
-
-
-class SigmarFactionsEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    sigmar_fac_layout = []
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-
-        def json_data_handler(in_data):
-            print("Json Data Handler Called")
-            self.set_json_data(in_data)
-        ee.on("json_loaded", json_data_handler)
-
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        sig_obj_list = ListObjectEditorWidget("AoS Factions", self.json_data, self.json_location,
-                                              self.sigmar_fac_layout)
-        self.body_widget = sig_obj_list
-        self.body_layout.addWidget(sig_obj_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)
-
-
-class SigmarGrandStrategyEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    sigmar_obj_layout = [
-        {"type": "text", "label": "Description", "jsonLocation": "description"},
-        {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
-        {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
-         "itemsLocation": "sigmarFactions"},
-    ]
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        sig_obj_list = ListObjectEditorWidget("Grand Strategies", self.json_data, self.json_location,
-                                              self.sigmar_obj_layout)
-        self.body_widget = sig_obj_list
-        self.body_layout.addWidget(sig_obj_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)
-
-
-class SigmarBattleTraitEditor(QWidget):
-    body_widget = None
-    body_layout = None
-    json_data = None
-    json_location = None
-    sigmar_obj_layout = [
-        {"type": "text", "label": "Battle Trait Description", "jsonLocation": "description"},
-        {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
-        {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
-            "itemsLocation": "sigmarFactions"},
-    ]
-
-    def __init__(self, json_data, json_location, ee):
-        super().__init__()
-        self.body_layout = QVBoxLayout()
-        self.setLayout(self.body_layout)
-
-        self.json_data = json_data
-        self.json_location = json_location
-        if isinstance(json_data, type(None)):
-            self.setup_missing_widget()
-        else:
-            self.setup_editor_widget()
-
-    def set_json_data(self, json_data):
-        self.json_data = json_data
-        self.setup_editor_widget()
-
-    def setup_editor_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_widget.hide()
-            self.body_layout.removeWidget(self.body_widget)
-
-        sig_obj_list = ListObjectEditorWidget("Battle Traits", self.json_data, self.json_location,
-                                              self.sigmar_obj_layout)
-        self.body_widget = sig_obj_list
-        self.body_layout.addWidget(sig_obj_list)
-
-    def setup_missing_widget(self):
-        if not isinstance(self.body_widget, type(None)):
-            self.body_layout.removeWidget(self.body_widget)
-
-        w = QLabel("File not loaded. Please load file in first tab to start editing!")
-        self.body_widget = w
-        self.body_layout.addWidget(w)
