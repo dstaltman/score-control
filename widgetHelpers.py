@@ -3,6 +3,13 @@ from integerWidget import IntegerWidget
 from comboBoxWidget import ComboBoxWidget
 from PySide6.QtWidgets import QFrame, QLabel
 from PySide6.QtCore import Qt
+import pydash
+
+
+# Creates a lambda to allow for combo box based on data in json
+def build_field_test(item_json_location: str, json_blob: dict, dict_json_location: str):
+    return lambda item: item_json_location not in item or item[item_json_location] \
+                        in [None, "", "None", pydash.get(json_blob, dict_json_location)]
 
 
 # Makes widgets and adds to passed in layout
@@ -22,6 +29,7 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
     use_list = isinstance(widget_list, list)
     for mainWidgetData in data:
         reset_value = None
+        text_box = False
         if "resetValue" in mainWidgetData:
             reset_value = mainWidgetData["resetValue"]
         if mainWidgetData["type"] == "text":
