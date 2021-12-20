@@ -29,7 +29,6 @@ def create_json_widgets(layout, json_data: dict, data=None, widget_list: list = 
     use_list = isinstance(widget_list, list)
     for mainWidgetData in data:
         reset_value = None
-        text_box = False
         if "resetValue" in mainWidgetData:
             reset_value = mainWidgetData["resetValue"]
         if mainWidgetData["type"] == "text":
