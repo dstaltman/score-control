@@ -20,7 +20,6 @@ from loadFileWidget import LoadFileWidget
 from aosWidgets import setup_sigmar_windows
 from widgets40k import setup_40k_windows
 
-
 # Global emitter
 ee = EventEmitter()
 
