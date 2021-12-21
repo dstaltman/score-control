@@ -20,7 +20,7 @@ import widgetHelpers
 from fileManager import FileManager
 from loadFileWidget import LoadFileWidget
 from listObjectEditorWidget import ListObjectEditorWidget
-
+from integerWidget import IntegerWidget
 
 # Global emitter
 ee = EventEmitter()
@@ -28,7 +28,7 @@ ee = EventEmitter()
 
 # Has all the stuff for AoS player data
 def build_field_test(item_json_location: str, json_blob: dict, dict_json_location: str):
-    return lambda item: item_json_location in item and item[item_json_location] \
+    return lambda item: item_json_location not in item or item[item_json_location] \
                         in [None, "", "None", pydash.get(json_blob, dict_json_location)]
 
 
@@ -87,6 +87,7 @@ class PlayerDetailsWidget(QWidget):
         QWidget.__init__(self)
 
         self.widget_list = []
+        self.json_data = json_data
 
         # Update Widgets lists - replace parts of the lists as needed to be more programmatic (seems shitty)
         left_edit_lists = [
@@ -119,9 +120,33 @@ class PlayerDetailsWidget(QWidget):
         reset_button.clicked.connect(self.reset_scores)
         layout.addWidget(reset_button, 0, 0, 1, 2)
 
+        # Turn Number Widget
+        round_widget = IntegerWidget("Round Number", json_data, "roundNum",
+                                     reset_value="1")
+        layout.addWidget(round_widget, 1, 0, 1, 2)
+
+        # No Active Player button
+        no_active_player = QPushButton("No active player")
+        no_active_player.clicked.connect(self.no_player_active)
+        layout.addWidget(no_active_player, 2, 0, 1, 2)
+
+        # Top / Bottom Buttons
+        turn_top_button = QPushButton("Set Round to TOP")
+        turn_top_button.clicked.connect(self.set_top_round)
+        layout.addWidget(turn_top_button, 3, 0, 1, 1)
+
+        turn_bot_button = QPushButton("Set Round to BOT")
+        turn_bot_button.clicked.connect(self.set_bot_round)
+        layout.addWidget(turn_bot_button, 3, 1, 1, 1)
+
         # Left Player column
         left_column = QVBoxLayout()
         left_column.setAlignment(Qt.AlignTop)
+
+        # Left Player active button at the top
+        left_active_button = QPushButton("Set Left Player Active")
+        left_active_button.clicked.connect(self.left_player_active)
+        left_column.addWidget(left_active_button)
 
         # Main Left Widgets
         widgetHelpers.create_json_widgets(left_column, json_data, self.layout_data["mainLeftColumn"], self.widget_list)
@@ -136,18 +161,25 @@ class PlayerDetailsWidget(QWidget):
             for wData in cur_round_data:
                 for key in wData.keys():
                     if type(wData[key]) is str:
-                        wData[key] = wData[key].format(roundNum=i+1, roundIndex=i)
+                        wData[key] = wData[key].format(roundNum=i + 1, roundIndex=i)
             widgetHelpers.create_json_widgets(tab_layout, json_data, cur_round_data, self.widget_list)
             tab.setLayout(tab_layout)
-            left_tabs.addTab(tab, "Round " + str(i+1) + " Scoring")
+            left_tabs.addTab(tab, "Round " + str(i + 1) + " Scoring")
         left_column.addWidget(left_tabs)
 
-        layout.addLayout(left_column, 1, 0)
+        layout.addLayout(left_column, 4, 0)
 
         # Right Player column
         right_column = QVBoxLayout()
         right_column.setAlignment(Qt.AlignTop)
-        widgetHelpers.create_json_widgets(right_column, json_data, self.layout_data["mainRightColumn"], self.widget_list)
+
+        # Right Player active button at the top
+        right_active_button = QPushButton("Set Right Player Active")
+        right_active_button.clicked.connect(self.right_player_active)
+        right_column.addWidget(right_active_button)
+
+        widgetHelpers.create_json_widgets(right_column, json_data, self.layout_data["mainRightColumn"],
+                                          self.widget_list)
 
         # Round widgets
         right_tabs = QTabWidget()
@@ -164,7 +196,7 @@ class PlayerDetailsWidget(QWidget):
             right_tabs.addTab(tab, "Round " + str(i + 1) + " Scoring")
         right_column.addWidget(right_tabs)
 
-        layout.addLayout(right_column, 1, 1)
+        layout.addLayout(right_column, 4, 1)
 
         self.setLayout(layout)
 
@@ -172,6 +204,29 @@ class PlayerDetailsWidget(QWidget):
     def reset_scores(self):
         for widget in self.widget_list:
             widget.reset_data()
+
+    @Slot()
+    def set_top_round(self):
+        pydash.set_(self.json_data, "roundOrder", "TOP")
+
+    @Slot()
+    def set_bot_round(self):
+        pydash.set_(self.json_data, "roundOrder", "BOT")
+
+    @Slot()
+    def left_player_active(self):
+        pydash.set_(self.json_data, "left.playerStatus", "ACTIVE")
+        pydash.set_(self.json_data, "right.playerStatus", "")
+
+    @Slot()
+    def right_player_active(self):
+        pydash.set_(self.json_data, "left.playerStatus", "")
+        pydash.set_(self.json_data, "right.playerStatus", "ACTIVE")
+
+    @Slot()
+    def no_player_active(self):
+        pydash.set_(self.json_data, "left.playerStatus", "")
+        pydash.set_(self.json_data, "right.playerStatus", "")
 
 
 class ScoreDetailsWidget(QWidget):
@@ -211,6 +266,7 @@ class SigmarFactionsEditor(QWidget):
         def json_data_handler(in_data):
             print("Json Data Handler Called")
             self.set_json_data(in_data)
+
         ee.on("json_loaded", json_data_handler)
 
         if isinstance(json_data, type(None)):
@@ -297,7 +353,7 @@ class SigmarBattleTraitEditor(QWidget):
         {"type": "text", "label": "Battle Trait Description", "jsonLocation": "description"},
         {"type": "integer", "label": "Point Value", "jsonLocation": "pointValue"},
         {"type": "combo", "label": "Army Type", "jsonLocation": "armyType",
-            "itemsLocation": "sigmarFactions"},
+         "itemsLocation": "sigmarFactions"},
     ]
 
     def __init__(self, json_data, json_location):
